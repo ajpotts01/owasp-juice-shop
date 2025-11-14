@@ -21,4 +21,6 @@ resource "azurerm_linux_web_app" "juice_shop" {
   lifecycle {
     ignore_changes = [site_config[0].application_stack]
   }
+
+  depends_on = [ azurerm_service_plan.consumption_plan ]
 }

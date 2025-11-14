@@ -4,9 +4,16 @@ module "resource_group" {
   app_name = var.app_name
 }
 
-module "app_service" {
-  source   = "./modules/app_service"
-  region   = var.region
+module "container_registry" {
+  source              = "./modules/container_registry"
+  region              = var.region
+  app_name            = var.app_name
   resource_group_name = module.resource_group.resource_group_name
-  app_name = var.app_name
+}
+
+module "app_service" {
+  source              = "./modules/app_service"
+  region              = var.region
+  resource_group_name = module.resource_group.resource_group_name
+  app_name            = var.app_name
 }
