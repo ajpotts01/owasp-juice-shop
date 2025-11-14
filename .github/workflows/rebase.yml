@@ -1,8 +1,10 @@
 name: Automatic Rebase
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch:
+# on:
+#   issue_comment:
+#     types: [created]
 
 jobs:
   rebase:
