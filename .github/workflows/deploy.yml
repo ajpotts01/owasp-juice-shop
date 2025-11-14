@@ -1,0 +1,50 @@
+name: "Deploy to Azure App Service"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_container:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: application
+    env:
+      ACR_URL: tbd.azurecr.io
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: false
+      - name: Login to ACR
+        uses: azure/docker-login@v1 # Check this is the right version
+        with:
+          login-server: ${{ env.ACR_URL }}
+      - name: Build and push image
+        run: |
+          docker build -t ${{ env.ACR_URL }}/juice-shop:latest .
+          docker push ${{ env.ACR_URL }}/juice-shop:latest
+  deploy:
+    needs: build_container
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: application
+    env:
+      ACR_URL: tbd.azurecr.io
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: false
+      - name: Deploy to app service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: juice-shop-app-service
+          images: ${{ env.ACR_URL }}/juice-shop:latest
